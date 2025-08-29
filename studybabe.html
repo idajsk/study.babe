@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Study Sanctuary — Aesthetic Notion-style Workspace</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --accent:#7f5af0;
+      --bg:#0b0b0c;
+      --card:#0f1113;
+      --muted:#9aa3b2;
+      --glass:rgba(255,255,255,0.04);
+      --glass-2:rgba(255,255,255,0.02);
+      --text:#e6eef6;
+      --radius:14px;
+      --shadow: 0 6px 24px rgba(2,6,23,0.6);
+    }
+
+    /* Theme overrides (applied to body[data-theme]) */
+    body[data-theme='purple']{ --accent:#9b5cff; --bg:#08060a; --card:rgba(12,10,14,0.7); --text:#ede9ff; }
+    body[data-theme='cloud']{ --accent:#5fb0ff; --bg:#f6fbff; --card:rgba(255,255,255,0.8); --text:#092033; --muted:#6a7785; }
+    body[data-theme='academia']{ --accent:#8b5e34; --bg:#0e0b07; --card:rgba(20,16,12,0.75); --text:#efe6db; --muted:#bfb0a0; }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:var(--bg); color:var(--text);}
+
+    /* Layout */
+    .app{display:grid;grid-template-columns: 320px 1fr 420px; gap:28px;padding:36px;min-height:100vh;align-items:start}
+    @media (max-width:1100px){.app{grid-template-columns: 1fr;padding:18px}}
+
+    /* Sidebar */
+    .sidebar{backdrop-filter: blur(6px); background:linear-gradient(180deg, var(--card), rgba(0,0,0,0.12)); padding:22px;border-radius:var(--radius);box-shadow:var(--shadow);}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--accent),transparent);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--bg);font-family:Playfair Display}
+    h1{margin:8px 0 2px;font-size:18px}
+    .sub{color:var(--muted);font-size:13px}
+
+    .profile{display:flex;gap:12px;align-items:center;margin-top:16px}
+    .avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.03),transparent);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .greet{font-size:14px}
+    .edit-name{font-size:12px;color:var(--muted);cursor:pointer}
+
+    .controls{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+    .theme-select{display:flex;gap:8px}
+    .theme-btn{padding:10px;border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.03);font-size:13px}
+
+    /* Timer area */
+    .main{padding:26px;border-radius:var(--radius);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:var(--shadow);min-height:520px}
+    .main-head{display:flex;justify-content:space-between;align-items:center}
+    .timer-card{margin-top:18px;padding:18px;border-radius:12px;background:var(--glass);display:flex;gap:18px;align-items:center}
+    .big-timer{font-family:Playfair Display;font-size:48px}
+    .timer-controls{display:flex;flex-direction:column;gap:8px}
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;background:var(--accent);color:var(--bg);font-weight:600}
+    .muted-btn{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text)}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* Tasks */
+    .tasks{margin-top:18px}
+    .tasks-head{display:flex;justify-content:space-between;align-items:center}
+    .task-list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+    .task{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;background:var(--glass-2);border:1px solid rgba(255,255,255,0.02)}
+    .task input[type='checkbox']{transform:scale(1.25);margin-top:6px}
+    .task .title{font-weight:600}
+    .task .note{font-size:13px;color:var(--muted)}
+    .task .actions{margin-left:auto;display:flex;gap:8px}
+
+    /* Right column - image + bubble + stats */
+    .right{padding:22px;border-radius:var(--radius);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));box-shadow:var(--shadow);min-height:520px;position:relative}
+    .hero{height:320px;border-radius:12px;background-size:cover;background-position:center;overflow:hidden;position:relative}
+    .hero::after{content:' ';position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.6))}
+    .bubble{position: absolute; left:18px; top:18px; width:220px; padding:14px;border-radius:14px; background:linear-gradient(180deg, rgba(0,0,0,0.5), rgba(0,0,0,0.25));backdrop-filter:blur(6px);}
+    .bubble h3{margin:0 0 6px;font-size:14px}
+    .motivation-text{font-family:Playfair Display;font-size:16px;line-height:1.1}
+    .motivation-controls{display:flex;gap:8px;margin-top:10px}
+    .tiny{font-size:12px;padding:6px 8px;border-radius:8px}
+
+    /* Input forms */
+    .form-row{display:flex;gap:8px}
+    input[type='text'], textarea, input[type='number']{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text);width:100%}
+
+    /* Footer stats */
+    .stats{display:flex;gap:10px;margin-top:18px}
+    .stat{padding:12px;border-radius:10px;background:var(--glass);flex:1;text-align:center}
+
+    /* Modal */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,4,8,0.6)}
+    .modal-card{background:var(--card);padding:28px;border-radius:12px;width:420px}
+
+    /* Small helpers */
+    .tag{font-size:12px;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.03)}
+    .search{margin-top:12px}
+
+    /* Nice micro animation */
+    .pulse{animation:pulse 3s infinite}
+    @keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+
+    /* Dark cloud/academia image sets via classes applied to body */
+    body[data-theme='purple'] .hero{background-image: url('https://images.unsplash.com/photo-1535408190508-be4c21946da6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');}
+    body[data-theme='cloud'] .hero{background-image: url('https://images.unsplash.com/photo-1535408190508-be4c21946da6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'); filter:brightness(1.05) saturate(0.95)}
+    /* Cloud image (lighter) */
+    body[data-theme='cloud'] .hero{background-image: url('https://plus.unsplash.com/premium_photo-1669749220135-8efb05a245f2?q=80&w=1143&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');}
+    /* Academia: old library / textured paper */
+    body[data-theme='academia'] .hero{background-image: url('https://i.pinimg.com/736x/4e/d7/2c/4ed72c050006e59805ba43130747b7c4.jpg');filter:contrast(0.9) saturate(0.8)}
+
+    /* Purple: foggy mountains + waves */
+    body[data-theme='purple'] .hero{background-image: url('https://images.unsplash.com/photo-1535408190508-be4c21946da6?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');filter:contrast(0.9) saturate(1.1)}
+
+    /* Fancy scrollbar (desktop) */
+    ::-webkit-scrollbar{width:10px;height:10px}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--accent),rgba(255,255,255,0.12));border-radius:10px}
+  </style>
+</head>
+<body data-theme="purple">
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">SS</div>
+        <div>
+          <h1>Study Sanctuary</h1>
+          <div class="sub">Aesthetic, focus-friendly workspace</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar" id="avatar">ID</div>
+        <div>
+          <div class="greet">Hey, <span id="display-name">stranger</span></div>
+          <div class="edit-name" id="editName">Edit name</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="small">Theme</div>
+        <div class="theme-select">
+          <button class="theme-btn" data-theme="purple">Purple & Black</button>
+          <button class="theme-btn" data-theme="cloud">White & Clouds</button>
+          <button class="theme-btn" data-theme="academia">Dark Academia</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="small">Timer presets</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="tiny muted-btn" data-preset="25">25</button>
+            <button class="tiny muted-btn" data-preset="50">50</button>
+            <button class="tiny muted-btn" data-preset="15">15</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="small">Quick tasks</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input type="text" id="quickTaskInput" placeholder="New quick task" />
+            <button class="tiny btn" id="quickAdd">Add</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:18px" class="search">
+        <input type="text" id="searchTasks" placeholder="Search tasks..." />
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div id="totalTasks">0</div><div class="small">Tasks</div></div>
+        <div class="stat"><div id="doneTasks">0</div><div class="small">Done</div></div>
+      </div>
+
+    </aside>
+
+    <main class="main">
+      <div class="main-head">
+        <div>
+          <div class="small">Timer</div>
+          <div class="muted small">Focus sessions with flexible lengths</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="tag" id="sessionCount">Session 0</div>
+          <div class="tag" id="longBreak">Long break every 4 sessions</div>
+        </div>
+      </div>
+
+      <div class="timer-card">
+        <div>
+          <div class="big-timer" id="timerDisplay">25:00</div>
+          <div class="small" id="timerState">Ready</div>
+        </div>
+        <div class="timer-controls">
+          <div style="display:flex;gap:8px">
+            <input type="number" id="minutesInput" min="1" value="25" style="width:120px" />
+            <input type="number" id="secondsInput" min="0" max="59" value="0" style="width:84px" />
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="startBtn">Start</button>
+            <button class="muted-btn" id="pauseBtn">Pause</button>
+            <button class="muted-btn" id="resetBtn">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="tasks">
+        <div class="tasks-head">
+          <div>
+            <div class="small">Tasks</div>
+            <div class="muted small">Add, check off, and rearrange your to-dos</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="taskTitle" placeholder="Task title" />
+            <button class="btn" id="addTask">Add</button>
+          </div>
+        </div>
+
+        <div class="task-list" id="taskList"></div>
+      </div>
+
+    </main>
+
+    <aside class="right">
+      <div class="hero"></div>
+
+      <div class="bubble">
+        <h3>your little study motivation 😽</h3>
+        <div class="motivation-text" id="motivation">You got this. Focus like fire.</div>
+        <div class="motivation-controls">
+          <button class="tiny muted-btn" id="prevMot">‹</button>
+          <button class="tiny muted-btn" id="nextMot">›</button>
+          <button class="tiny btn" id="copyMot">Copy</button>
+        </div>
+      </div>
+
+      <div style="position:absolute;right:18px;bottom:18px;display:flex;gap:8px">
+        <button class="muted-btn" id="exportTasks">Export</button>
+        <button class="muted-btn" id="importTasks">Import</button>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Name modal -->
+  <div class="modal" id="nameModal" style="display:none">
+    <div class="modal-card">
+      <h2 style="font-family:Playfair Display;margin:0 0 8px">Welcome to Study Sanctuary</h2>
+      <p class="small" style="margin:0 0 12px">Type your name so it can stop calling you stranger. Go on.</p>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="nameInput" placeholder="Your name" />
+        <button class="btn" id="saveName">Save</button>
+      </div>
+      <div style="margin-top:8px;font-size:12px;color:var(--muted)">You can change this later in the sidebar.</div>
+    </div>
+  </div>
+
+  <script>
+    // --- State and utilities ---
+    const state = {
+      name: localStorage.getItem('ss_name') || '',
+      theme: localStorage.getItem('ss_theme') || 'purple',
+      tasks: JSON.parse(localStorage.getItem('ss_tasks') || '[]'),
+      motivationIndex: parseInt(localStorage.getItem('ss_mot')||'0'),
+      timer: {secs: 25*60, running: false, interval: null, sessions: parseInt(localStorage.getItem('ss_sessions')||'0')}
+    }
+
+    const MOTIVATIONS = [
+      "Study like you’re seducing the future—slow, intense, inevitable.",
+      "Your focus is hot; make the pages melt under it.",
+      "Eyes on the prize. Breathe, read, conquer. I dare you.",
+      "Let the silence do the heavy lifting. You handle the brilliance.",
+      "A single page could change everything. Make it tremble under your attention.",
+      "You’re closer than you think. Take this minute and steal your future.",
+      "Turn distraction into dust. You’re irresistible when you finish.",
+      "Your brain is a weapon. Load it and aim at success.",
+      "This session: ruthless. This reward: deserved. This you: unstoppable.",
+      "Hot, intense, focused. You’re rewriting your destiny. Carefully.",
+      "Make your notes blush. Commit the facts like they’ve wronged you.",
+      "Whisper to the textbook that you’ll remember this forever—and mean it.",
+      "Your heartbeat sounds like a metronome. Keep time, keep going.",
+      "Close the tabs. Close the noise. Open the world in your notebook.",
+      "You’re tasting victory. Don’t spit it out—study for another minute.",
+      "This is work, and you’re deliciously good at it.",
+      "Intensity looks good on you. Keep that up for 25 minutes.",
+      "Feel the butterflies? That’s your future noticing you. Stir the pot.",
+      "Make the page gaslight you into believing it wasn’t worth reading—prove it wrong.",
+      "Finish this. Then reward yourself like you actually earned it."
+    ];
+
+    // --- DOM refs ---
+    const nameModal = document.getElementById('nameModal');
+    const nameInput = document.getElementById('nameInput');
+    const saveName = document.getElementById('saveName');
+    const displayName = document.getElementById('display-name');
+    const avatar = document.getElementById('avatar');
+    const editName = document.getElementById('editName');
+
+    const themeBtns = document.querySelectorAll('.theme-btn');
+    const taskList = document.getElementById('taskList');
+    const addTaskBtn = document.getElementById('addTask');
+    const taskTitle = document.getElementById('taskTitle');
+    const quickAdd = document.getElementById('quickAdd');
+    const quickTaskInput = document.getElementById('quickTaskInput');
+    const totalTasks = document.getElementById('totalTasks');
+    const doneTasks = document.getElementById('doneTasks');
+    const searchTasks = document.getElementById('searchTasks');
+
+    // Timer refs
+    const minutesInput = document.getElementById('minutesInput');
+    const secondsInput = document.getElementById('secondsInput');
+    const timerDisplay = document.getElementById('timerDisplay');
+    const startBtn = document.getElementById('startBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const timerState = document.getElementById('timerState');
+    const sessionCount = document.getElementById('sessionCount');
+
+    // Motivation refs
+    const motivationEl = document.getElementById('motivation');
+    const prevMot = document.getElementById('prevMot');
+    const nextMot = document.getElementById('nextMot');
+    const copyMot = document.getElementById('copyMot');
+
+    // Misc
+    const exportBtn = document.getElementById('exportTasks');
+    const importBtn = document.getElementById('importTasks');
+    const sessionCountTag = document.getElementById('sessionCount');
+
+    // --- Initialization ---
+    function applyTheme(t){
+      document.body.setAttribute('data-theme', t);
+      localStorage.setItem('ss_theme', t);
+    }
+    applyTheme(state.theme);
+
+    function personalizeName(name){
+      displayName.textContent = name || 'stranger';
+      avatar.textContent = (name||'S').slice(0,2).toUpperCase();
+      localStorage.setItem('ss_name', name||'');
+    }
+    if(state.name){
+      personalizeName(state.name);
+    } else {
+      nameModal.style.display = 'flex';
+    }
+
+    // --- Tasks ---
+    function saveTasks(){ localStorage.setItem('ss_tasks', JSON.stringify(state.tasks)); renderTasks(); }
+
+    function addTask(title, note=''){
+      if(!title) return;
+      const t = {id:Date.now(), title, note, done:false, created:Date.now()};
+      state.tasks.unshift(t);
+      saveTasks();
+    }
+
+    function toggleDone(id){
+      const t = state.tasks.find(x=>x.id==id); if(!t) return; t.done=!t.done; saveTasks(); updateStats(); }
+    function deleteTask(id){ state.tasks = state.tasks.filter(x=>x.id!=id); saveTasks(); updateStats(); }
+
+    function renderTasks(){
+      const q = searchTasks.value.toLowerCase();
+      taskList.innerHTML = '';
+      state.tasks.filter(t=>t.title.toLowerCase().includes(q) || (t.note||'').toLowerCase().includes(q)).forEach(t=>{
+        const el = document.createElement('div'); el.className='task';
+        el.innerHTML = `
+          <input type='checkbox' ${t.done? 'checked':''} data-id='${t.id}' />
+          <div style='flex:1'>
+            <div class='title'>${escapeHtml(t.title)}</div>
+            <div class='note'>${escapeHtml(t.note||'')}</div>
+          </div>
+          <div class='actions'>
+            <button class='tiny muted-btn' data-del='${t.id}'>Delete</button>
+          </div>`;
+        taskList.appendChild(el);
+      });
+      // attach listeners
+      taskList.querySelectorAll("input[type='checkbox']").forEach(cb=>cb.addEventListener('change', e=>{ toggleDone(e.target.dataset.id); }));
+      taskList.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', e=>{ deleteTask(e.target.dataset.del); }));
+      updateStats();
+    }
+
+    function updateStats(){ totalTasks.textContent = state.tasks.length; doneTasks.textContent = state.tasks.filter(t=>t.done).length; }
+
+    // --- Timer ---
+    function formatTime(s){ const m=Math.floor(s/60); const sec=s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}` }
+    function setTimerFromInputs(){ const m=parseInt(minutesInput.value)||0; const s=parseInt(secondsInput.value)||0; state.timer.secs = m*60 + s; timerDisplay.textContent = formatTime(state.timer.secs); localStorage.setItem('ss_timer', state.timer.secs); }
+
+    minutesInput.addEventListener('change', setTimerFromInputs);
+    secondsInput.addEventListener('change', setTimerFromInputs);
+
+    function startTimer(){ if(state.timer.running) return; state.timer.running=true; timerState.textContent='Running'; startBtn.disabled=true; state.timer.interval = setInterval(()=>{
+      if(state.timer.secs<=0){ clearInterval(state.timer.interval); state.timer.running=false; startBtn.disabled=false; onTimerEnd(); return; }
+      state.timer.secs--; timerDisplay.textContent = formatTime(state.timer.secs);
+    },1000); }
+
+    function pauseTimer(){ if(!state.timer.running) return; clearInterval(state.timer.interval); state.timer.running=false; startBtn.disabled=false; timerState.textContent='Paused'; }
+    function resetTimer(){ pauseTimer(); setTimerFromInputs(); timerState.textContent='Ready'; }
+
+    function onTimerEnd(){ timerState.textContent='Finished'; state.timer.sessions++; localStorage.setItem('ss_sessions', state.timer.sessions); sessionCountTag.textContent = 'Session ' + state.timer.sessions; // subtle chime via vibration if available
+      try{ if(navigator.vibrate) navigator.vibrate([200,100,200]); }catch(e){}
+    }
+
+    // --- Motivation bubble ---
+    function renderMotivation(){ motivationEl.textContent = MOTIVATIONS[state.motivationIndex % MOTIVATIONS.length]; localStorage.setItem('ss_mot', state.motivationIndex); }
+    prevMot.addEventListener('click', ()=>{ state.motivationIndex = (state.motivationIndex-1 + MOTIVATIONS.length) % MOTIVATIONS.length; renderMotivation(); });
+    nextMot.addEventListener('click', ()=>{ state.motivationIndex = (state.motivationIndex+1) % MOTIVATIONS.length; renderMotivation(); });
+    copyMot.addEventListener('click', ()=>{ navigator.clipboard?.writeText(MOTIVATIONS[state.motivationIndex]) ; copyMot.textContent='Copied'; setTimeout(()=>copyMot.textContent='Copy',900); });
+
+    // --- small helpers ---
+    function escapeHtml(unsafe){ return unsafe.replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m]; }); }
+
+    // --- Events ---
+    saveName.addEventListener('click', ()=>{ const v=nameInput.value.trim(); if(!v) return; personalizeName(v); state.name=v; localStorage.setItem('ss_name',v); nameModal.style.display='none'; });
+    editName.addEventListener('click', ()=>{ nameModal.style.display='flex'; nameInput.value=''; });
+
+    document.querySelectorAll('.theme-btn').forEach(b=>b.addEventListener('click', e=>{ applyTheme(e.target.dataset.theme); }));
+    document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click', e=>{ minutesInput.value = e.target.dataset.preset; secondsInput.value='0'; setTimerFromInputs(); }));
+
+    startBtn.addEventListener('click', ()=>{ if(state.timer.secs<=0) setTimerFromInputs(); startTimer(); });
+    pauseBtn.addEventListener('click', pauseTimer);
+    resetBtn.addEventListener('click', ()=>{ resetTimer(); });
+
+    addTaskBtn.addEventListener('click', ()=>{ addTask(taskTitle.value.trim()); taskTitle.value=''; });
+    quickAdd.addEventListener('click', ()=>{ if(quickTaskInput.value.trim()){ addTask(quickTaskInput.value.trim()); quickTaskInput.value=''; } });
+    searchTasks.addEventListener('input', renderTasks);
+
+    exportBtn.addEventListener('click', ()=>{ const data = JSON.stringify({name: state.name, tasks: state.tasks}); const blob = new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='study-sanctuary-export.json'; a.click(); URL.revokeObjectURL(url); });
+    importBtn.addEventListener('click', ()=>{ const inp=document.createElement('input'); inp.type='file'; inp.accept='application/json'; inp.onchange=e=>{ const f=e.target.files[0]; const r=new FileReader(); r.onload=ev=>{ try{ const parsed=JSON.parse(ev.target.result); if(Array.isArray(parsed.tasks)) { state.tasks = parsed.tasks; saveTasks(); } }catch(err){ alert('Invalid file') } }; r.readAsText(f); }; inp.click(); });
+
+    // load saved tasks
+    renderMotivation(); renderTasks(); setTimerFromInputs(); sessionCountTag.textContent = 'Session ' + (state.timer.sessions||0);
+
+    // small UX nicety: keyboard shortcuts
+    document.addEventListener('keydown', e=>{
+      if(e.key===' ' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName!=='TEXTAREA'){
+        e.preventDefault(); if(state.timer.running) pauseTimer(); else startTimer();
+      }
+      if(e.key==='n' && (e.ctrlKey||e.metaKey)){
+        e.preventDefault(); nameModal.style.display='flex';
+      }
+    });
+
+    // friendly but condescending assistant flavor text: small console message for the user who inspects the page
+    console.log('%cStudy Sanctuary loaded. Bring your brains, not your excuses.','color:var(--accent);font-weight:700');
+
+  </script>
+</body>
+</html>
